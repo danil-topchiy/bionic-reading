@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "version": "0.1",
+  "name": "Bionic reading",
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["src/main.js"]
+    }
+  ]
+}
