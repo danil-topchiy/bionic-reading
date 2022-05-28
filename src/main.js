@@ -1,36 +1,36 @@
 function main() {
-    walkElements(document.body);
-}
-
-function walkElements(currentNode) {
-    for (let childNode of currentNode.childNodes) {
-        switch (childNode.nodeType) {
-            case Node.TEXT_NODE:
-                if (childNode.textContent) {
-                    currentNode.replaceChild(makeTextNodeBionic(childNode), childNode);
-                }
-                break;
-            case Node.ELEMENT_NODE:
-                walkElements(childNode);
-                break;
-        }
+    const textNodes = getAllTextNodes(document.body);
+    for (const node of textNodes) {
+        node.replaceWith(...makeTextNodeBionic(node));
     }
 }
 
+function getAllTextNodes(currentNode) {
+    const walker = document.createTreeWalker(currentNode, NodeFilter.SHOW_TEXT, null);
+    textNodes = [];
+    let n;
+    while (n = walker.nextNode()) {
+        if (n.textContent.trim()) textNodes.push(n);
+    }
+    return textNodes;
+}
+
 function makeTextNodeBionic(textNode) {
-    const wrapperNode = document.createElement("span");
+    const bionicNodes = [];
     for (const word of textNode.textContent.split(" ")) {
+
         const middle = Math.ceil(word.length / 2);
 
         const strongPart = document.createElement("strong");
         strongPart.appendChild(document.createTextNode(word.slice(0, middle)));
 
-        const normalPart = document.createTextNode(word.slice(middle, word.length)  + " ");
+        const normalPart = document.createTextNode(word.slice(middle, word.length));
         
-        wrapperNode.appendChild(strongPart);
-        wrapperNode.appendChild(normalPart);
+        bionicNodes.push(strongPart);
+        bionicNodes.push(normalPart);
+        bionicNodes.push(document.createTextNode(" "));
     }
-    return wrapperNode;
+    return bionicNodes;
 }
 
 main();
