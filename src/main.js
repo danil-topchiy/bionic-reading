@@ -1,7 +1,11 @@
+const TAGS_TO_SKIP = ["STRONG", "A", "CODE"];
+
 function main() {
     const textNodes = getAllTextNodes(document.body);
     for (const node of textNodes) {
-        node.replaceWith(...makeTextNodeBionic(node));
+        if (shouldMakeNodeBionic(node, TAGS_TO_SKIP)) {
+            node.replaceWith(...makeTextNodeBionic(node));
+        }
     }
 }
 
@@ -19,18 +23,45 @@ function makeTextNodeBionic(textNode) {
     const bionicNodes = [];
     for (const word of textNode.textContent.split(" ")) {
 
-        const middle = Math.ceil(word.length / 2);
+        let strongText, normalText;
+        [strongText, normalText] = makeWordBionic(word);
 
         const strongPart = document.createElement("strong");
-        strongPart.appendChild(document.createTextNode(word.slice(0, middle)));
-
-        const normalPart = document.createTextNode(word.slice(middle, word.length));
-        
+        strongPart.appendChild(document.createTextNode(strongText));
         bionicNodes.push(strongPart);
-        bionicNodes.push(normalPart);
+
+        if (normalText.length > 0) {
+            bionicNodes.push(document.createTextNode(normalText));
+        }
+
         bionicNodes.push(document.createTextNode(" "));
     }
     return bionicNodes;
+}
+
+function makeWordBionic (word) {
+    let splitIndex;
+    if (word.length > 3) {
+        splitIndex = Math.ceil(word.length / 2);
+    } else if (word.length <= 3) {
+        splitIndex = 1;
+    }
+    return [word.slice(0, splitIndex), 
+            word.slice(splitIndex, word.length)];
+}
+
+function shouldMakeNodeBionic(node, nodesToSkip, depth = 3) {
+    // check if node is child of nodes to skip
+    let currentDepth = 0;
+    let currentParent = node.parentElement;
+    while (currentDepth < depth) {
+        if (nodesToSkip.includes(currentParent.tagName)) {
+            return false;
+        } 
+        currentParent = currentParent.parentElement;
+        currentDepth += 1;
+    }
+    return true;
 }
 
 main();
