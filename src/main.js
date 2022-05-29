@@ -26,7 +26,7 @@ function makeTextNodeBionic(textNode) {
         let strongText, normalText;
         [strongText, normalText] = makeWordBionic(word);
 
-        const strongPart = document.createElement("strong");
+        const strongPart = document.createElement("b");
         strongPart.appendChild(document.createTextNode(strongText));
         bionicNodes.push(strongPart);
 
